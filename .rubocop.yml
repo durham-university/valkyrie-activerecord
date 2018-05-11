@@ -1,0 +1,35 @@
+require: rubocop-rspec
+inherit_gem:
+  bixby: bixby_default.yml
+AllCops:
+  DisplayCopNames: true
+  TargetRubyVersion: 2.3
+  Exclude:
+    - 'bin/*'
+    - 'vendor/**/*'
+    - 'test_app/**/*'
+Style/FileName:
+  Enabled: true
+  Exclude:
+    - 'Gemfile'
+    - '**/*.rake'
+    - 'valkyrie-activerecord.gemspec'
+Metrics/BlockLength:
+  Exclude:
+    - '**/*.gemspec'
+    - 'spec/**/*'
+    - 'lib/valkyrie/specs/**/*'
+    - 'lib/specs/**/*'
+    - 'lib/tasks/dev.rake'
+    - 'Rakefile'
+Metrics/MethodLength:
+  Exclude:
+    - 'db/migrate/20180427103900_create_orm_resources.rb'
+RSpec/MultipleExpectations:
+  Enabled: false
+RSpec/ExampleLength:
+  Enabled: false
+Lint/UnusedMethodArgument:
+  Enabled: true
+Security/MarshalLoad:
+  Enabled: true
