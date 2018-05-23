@@ -10,7 +10,7 @@ module Valkyrie::Persistence::ActiveRecord
     # @!attribute field
     #   @return [String] The field name
     # @!attribute value
-    #   @return [String] The alternate identifier
+    #   @return [String] The field value
     #
     class IndexedField < ActiveRecord::Base
       belongs_to  :orm_resource,

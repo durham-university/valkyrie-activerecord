@@ -21,7 +21,7 @@ You can then use ```:activerecord``` as a metadata adapter in `config/valkyrie.y
 
 ## Indexing
 
-You will need to specify all of the fields that you are going to be using for searching beforehand, except for the these standard ones that are handled automatically: ```member_ids```, ```alternate_ids``` and ```internal_resource```. This includes any fields you intend to use with the ```find_inverse_references_by``` query method. To do this, pass a hash of fields to the ```MetadataAdapter``` initializer (typically done in ```config/initializers/valkyrie.rb```). For example:
+You will need to specify all of the fields that you are going to be using for searching beforehand, except for these standard ones that are handled automatically: ```member_ids```, ```alternate_ids``` and ```internal_resource```. This includes any fields you intend to use with the ```find_inverse_references_by``` query method. To do this, pass a hash of fields to the ```MetadataAdapter``` initializer (typically done in ```config/initializers/valkyrie.rb```). For example:
 
 ```ruby
 Valkyrie::Persistence::ActiveRecord::MetadataAdapter.new(indexed_fields: {
