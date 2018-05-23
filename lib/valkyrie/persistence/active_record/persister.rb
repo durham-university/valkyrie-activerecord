@@ -34,6 +34,7 @@ module Valkyrie::Persistence::ActiveRecord
 
     # (see Valkyrie::Persistence::Memory::Persister#wipe!)
     def wipe!
+      resource_factory.orm_class.indexed_fields_class.delete_all
       resource_factory.orm_class.delete_all
     end
 
