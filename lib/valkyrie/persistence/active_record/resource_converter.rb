@@ -24,9 +24,8 @@ module Valkyrie::Persistence::ActiveRecord
 
       def index_fields(orm_object)
         orm_object.indexed_fields.clear
-        full_resource = resource_factory.to_resource(object: orm_object)
         adapter.indexed_fields.each do |field, info|
-          val = full_resource.try(field.to_sym)
+          val = resource.try(field.to_sym)
           next unless val.present?
           if info[:join]
             Array.wrap(val).each do |v|
