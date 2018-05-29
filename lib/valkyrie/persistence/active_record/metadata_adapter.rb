@@ -30,7 +30,10 @@ module Valkyrie::Persistence::ActiveRecord
     # Information about additional fields that need to be indexed
     # @return [Hash]
     def indexed_fields
-      @indexed_fields ||= { alternate_ids: { join: true } }.merge(config.fetch(:indexed_fields, {}))
+      @indexed_fields ||= { 
+        member_ids: { join: true },
+        alternate_ids: { join: true }
+      }.merge(config.fetch(:indexed_fields, {}))
     end
   end
 end

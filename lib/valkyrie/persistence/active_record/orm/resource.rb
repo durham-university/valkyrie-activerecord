@@ -15,20 +15,21 @@ module Valkyrie::Persistence::ActiveRecord
     #   @return [String] Name of {Valkyrie::Resource} model - used for casting.
     #
     class Resource < ActiveRecord::Base
-      has_and_belongs_to_many :members,
-                              join_table: "orm_resource_members",
-                              class_name: "::Valkyrie::Persistence::ActiveRecord::ORM::Resource",
-                              foreign_key: "container_id",
-                              association_foreign_key: "member_id"
 
-      has_and_belongs_to_many :containers,
-                              join_table: "orm_resource_members",
+      has_and_belongs_to_many :members, -> { where( orm_indexed_fields: {field: 'member_ids'} ) },
+                              join_table: "orm_indexed_fields",
                               class_name: "::Valkyrie::Persistence::ActiveRecord::ORM::Resource",
-                              foreign_key: "member_id",
-                              association_foreign_key: "container_id"
+                              foreign_key: "orm_resource_id",
+                              association_foreign_key: "value"
+
+      has_and_belongs_to_many :containers, -> { where( orm_indexed_fields: {field: 'member_ids'}) },
+                              join_table: "orm_indexed_fields",
+                              class_name: "::Valkyrie::Persistence::ActiveRecord::ORM::Resource",
+                              foreign_key: "value",
+                              association_foreign_key: "orm_resource_id"
 
       has_many  :indexed_fields,
-                dependent: :destroy,
+                dependent: :delete_all,
                 class_name: "::Valkyrie::Persistence::ActiveRecord::ORM::IndexedField",
                 foreign_key: "orm_resource_id"
 

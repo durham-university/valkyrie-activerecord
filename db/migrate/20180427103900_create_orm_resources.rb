@@ -7,11 +7,6 @@ class CreateOrmResources < ActiveRecord::Migration[5.0]
       t.timestamps
     end
 
-    create_table :orm_resource_members, id: false do |t|
-      t.string :container_id, null: false, index: true
-      t.string :member_id, null: false, index: true
-    end
-
     create_table :orm_indexed_fields do |t|
       t.string :orm_resource_id, null: false, index: true
       t.string :field
