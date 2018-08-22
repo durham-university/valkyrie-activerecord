@@ -13,10 +13,18 @@ module Valkyrie::Persistence::ActiveRecord
     def convert!
       orm_class.find_or_initialize_by(id: resource.id && resource.id.to_s).tap do |orm_object|
         orm_object.internal_resource = resource.internal_resource
-        orm_object.metadata = orm_object.json_metadata.merge(resource.attributes.except(:id, :internal_resource, :created_at, :updated_at))
+        orm_object.metadata = orm_object.json_metadata.merge(attributes)
 
         index_fields(orm_object)
       end
+    end
+
+    def attributes
+      Hash[
+        resource.attributes.except(:id, :internal_resource, :created_at, :updated_at).compact.map do |k, v|
+          [k, Array.wrap(v)]
+        end
+      ]
     end
 
     private
