@@ -6,6 +6,7 @@ module Valkyrie::Persistence::ActiveRecord
   # {Valkyrie::Resource} and {Valkyrie::Persistence::ActiveRecord::ORM::Resource}.
   class ResourceFactory
     attr_reader :adapter
+    delegate :id, to: :adapter, prefix: true
     def initialize(adapter:)
       @adapter = adapter
     end

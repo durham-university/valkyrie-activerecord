@@ -20,7 +20,30 @@ module Valkyrie::Persistence::ActiveRecord
     private
 
       def resource
-        resource_klass.new(attributes.merge(new_record: false))
+        resource_klass.new(
+          attributes.merge(
+            new_record: false,
+            Valkyrie::Persistence::Attributes::OPTIMISTIC_LOCK => lock_token
+          )
+        )
+      end
+
+      def lock_token
+        return lock_token_warning unless orm_object.class.column_names.include?("lock_version")
+        @lock_token ||=
+          Valkyrie::Persistence::OptimisticLockToken.new(
+            adapter_id: resource_factory.adapter_id,
+            token: orm_object.lock_version
+          )
+      end
+
+      def lock_token_warning
+        return nil unless resource_klass.optimistic_locking_enabled?
+        warn "[MIGRATION REQUIRED] You have loaded a resource from the ActiveRecord adapter with " \
+             "optimistic locking enabled, but the necessary migrations have not been run. \n" \
+             "Please run `bin/rails valkyrie_active_record_engine:install:migrations && bin/rails db:migrate` " \
+             "to enable this feature for ActiveRecord."
+        nil
       end
 
       def resource_klass

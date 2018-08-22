@@ -13,10 +13,20 @@ module Valkyrie::Persistence::ActiveRecord
     def convert!
       orm_class.find_or_initialize_by(id: resource.id && resource.id.to_s).tap do |orm_object|
         orm_object.internal_resource = resource.internal_resource
+        process_lock_token(orm_object)
         orm_object.metadata = orm_object.json_metadata.merge(attributes)
 
         index_fields(orm_object)
       end
+    end
+
+    def process_lock_token(orm_object)
+      return unless resource.respond_to?(Valkyrie::Persistence::Attributes::OPTIMISTIC_LOCK)
+      db_token = resource[Valkyrie::Persistence::Attributes::OPTIMISTIC_LOCK].find do |token|
+        token.adapter_id == resource_factory.adapter_id
+      end
+      return unless db_token
+      orm_object.lock_version = db_token.token
     end
 
     def attributes
