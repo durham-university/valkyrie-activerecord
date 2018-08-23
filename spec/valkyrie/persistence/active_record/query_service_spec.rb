@@ -13,7 +13,6 @@ RSpec.describe Valkyrie::Persistence::ActiveRecord::QueryService do
 
     before {
       class CustomResource < Valkyrie::Resource
-        attribute :id, Valkyrie::Types::ID.optional
         attribute :alternate_ids, Valkyrie::Types::Array
         attribute :title
         attribute :member_ids, Valkyrie::Types::Array
