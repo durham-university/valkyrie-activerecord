@@ -88,9 +88,15 @@ module Valkyrie::Persistence::ActiveRecord
 
     # (see Valkyrie::Persistence::Memory::QueryService#find_references_by)
     def find_references_by(resource:, property:)
-      orm_class.where(id: Array.wrap(resource[property]).map(&:to_s)).find_each.lazy.map do |object|
-        resource_factory.to_resource(object: object)
+      # Orm_class.where(id: ids) will return an object only once even if the id appears
+      # twice in ids. The specification requires that the object is returned twice in this
+      # case.
+      ids = Array.wrap(resource[property]).map(&:to_s)
+      orm_objects = {}
+      orm_class.where(id: ids).each do |orm_object|
+        orm_objects[orm_object.id.to_s] = orm_object
       end
+      ids.lazy.map do |id| resource_factory.to_resource(object: orm_objects[id]) end
     end
 
     # (see Valkyrie::Persistence::Memory::QueryService#find_inverse_references_by)
@@ -131,5 +137,9 @@ module Valkyrie::Persistence::ActiveRecord
       def id_type
         @id_type ||= orm_class.columns_hash["id"].type
       end
+
+      def ordered_property?(resource:, property:)
+        resource.class.schema[property].meta.try(:[], :ordered)
+      end      
   end
 end
