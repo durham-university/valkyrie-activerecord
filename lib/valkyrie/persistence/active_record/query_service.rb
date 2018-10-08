@@ -81,28 +81,34 @@ module Valkyrie::Persistence::ActiveRecord
     # (see Valkyrie::Persistence::Memory::QueryService#find_parents)
     def find_parents(resource:)
       orm_resource = resource_factory.from_resource(resource: resource)
-      orm_resource.containers.lazy.map do |object|
+      orm_resource.containers.uniq.lazy.map do |object|
         resource_factory.to_resource(object: object)
       end
     end
 
     # (see Valkyrie::Persistence::Memory::QueryService#find_references_by)
     def find_references_by(resource:, property:)
-      # Orm_class.where(id: ids) will return an object only once even if the id appears
-      # twice in ids. The specification requires that the object is returned twice in this
-      # case.
       ids = Array.wrap(resource[property]).map(&:to_s)
-      orm_objects = {}
-      orm_class.where(id: ids).each do |orm_object|
-        orm_objects[orm_object.id.to_s] = orm_object
+      if ordered_property?(resource: resource, property: property)
+        orm_objects = {}
+        orm_class.where(id: ids).each do |orm_object|
+          orm_objects[orm_object.id.to_s] = resource_factory.to_resource(object: orm_object)
+        end
+        ids.lazy.map do |id| orm_objects[id] if orm_objects.key?(id) end .reject(&:nil?)
+      else
+        orm_class.where(id:ids).map do |o| resource_factory.to_resource(object: o) end
       end
-      ids.lazy.map do |id| resource_factory.to_resource(object: orm_objects[id]) end
     end
 
     # (see Valkyrie::Persistence::Memory::QueryService#find_inverse_references_by)
     def find_inverse_references_by(resource:, property:)
       ensure_persisted(resource)
-      find_by_field(field: property, value: resource.id.to_s)
+      returned = {}
+      find_by_field(field: property, value: resource.id.to_s).reject do |o|
+        next true if returned.key?(o.id)
+        returned[o.id] = true
+        false
+      end
     end
 
     def find_by_field(field:, value:)
